@@ -1,0 +1,33 @@
+library(ggplot2)
+#step 0: downlaod files
+
+zipUrl <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"
+zipFile <- "exdata_data_NEI_data.zip"
+
+if (!file.exists(zipFile)) {
+  download.file(zipUrl, zipFile, mode = "wb")
+}
+
+# unzip zip file containing data if data directory doesn't already exist
+dataPath <- "exdata_data_NEI_data"
+if (!file.exists(dataPath)) {
+  unzip(zipFile)
+}
+
+
+#read the file
+NEI <- readRDS("summarySCC_PM25.rds")
+SCC <-readRDS('Source_Classification_Code.rds')
+
+
+#make the plot
+
+NEI_baltimore <- subset(NEI, fips=="24510")
+png(filename="plot3.png", width = 480, height = 480)
+
+myplot<- ggplot(NEI_baltimore, aes(year, Emissions, color=type))+ 
+  stat_summary(fun.y = sum, na.rm = TRUE, geom ='line') +
+  labs(title = "Total PM2.5 emission from four sources in Baltimore City") + xlab('Year') + ylab('Total PM2.5 emission')
+
+print(myplot)
+dev.off()
